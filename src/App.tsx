@@ -28,7 +28,6 @@ import AcceptInvitation from './pages/AcceptInvitation'
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const { data, isPending } = authClient.useSession()
-  console.log("data", data);
   
   if (isPending) {
     return <div className="p-6 text-sm text-slate-600">Loading...</div>
@@ -39,6 +38,16 @@ function RequireAuth({ children }: { children: ReactNode }) {
   }
 
   return <>{children}</>
+}
+
+function AuthGate() {
+  const { data, isPending } = authClient.useSession()
+
+  if (isPending) {
+    return <div className="p-6 text-sm text-slate-600">Loading...</div>
+  }
+
+  return <Navigate to={data?.user ? "/home" : "/login"} replace />
 }
 
 function RequireAdmin({ children }: { children: ReactNode }) {
@@ -60,7 +69,7 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Navigate to="/home" replace />} />
+        <Route path="/" element={<AuthGate />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/accept-invitation" element={<AcceptInvitation />} />
         
@@ -105,7 +114,7 @@ function App() {
           }
         />
 
-        <Route path="*" element={<Navigate to="/home" replace />} />
+        <Route path="*" element={<AuthGate />} />
       </Routes>
     </>
   )
